@@ -102,6 +102,8 @@ echo ""
 echo "*** Performance forked server."
 echo " "
 
+# Start timing for data collection
+start_time=$(date +%s)
 
 ## Remove any performance data files.
 rm -rf perf_*.txt
@@ -125,12 +127,20 @@ for ((i=1;i<CONCURRENCY;i++)); do
     echo "$i => $statistics " | tee -a statistics_fork.log
 done
 
+# End timing for data collection
+end_time=$(date +%s)
+duration=$((end_time - start_time))
+echo "Time taken for data collection (forked server): $duration seconds"
 
 echo "*** Performance threaded server."
 echo " "
 
 ## Remove any performance data files. 
 rm -rf perf_*.txt
+
+# Start timing for data collection
+start_time=$(date +%s)
+
 for ((i=1;i<CONCURRENCY;i++)); do
     for ((k=1;k<REPEAT;k++)); do
 	bonkers=$(ab -n 10000 -c $i http://127.0.0.1:$portTHREAD/big 2>/dev/null | grep 'Requests per second');
@@ -151,6 +161,10 @@ for ((i=1;i<CONCURRENCY;i++)); do
     echo "$i => $statistics " | tee -a statistics_thread.log
 done
 
+# End timing for data collection
+end_time=$(date +%s)
+duration=$((end_time - start_time))
+echo "Time taken for data collection (threaded server): $duration seconds"
 
 gnuplot dcollect.p
 
